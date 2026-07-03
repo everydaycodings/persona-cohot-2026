@@ -1,0 +1,25 @@
+# Local infrastructure for Persona AI.
+#   cd setup && docker compose up -d
+# Postgres 17 with the pgvector extension preinstalled (used for RAG grounding).
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: persona-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: persona
+      POSTGRES_PASSWORD: persona
+      POSTGRES_DB: persona
+    # Host port 5434 to avoid clashing with any Postgres already on 5432.
+    ports:
+      - "5434:5432"
+    volumes:
+      - persona-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U persona -d persona"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  persona-pg-data:

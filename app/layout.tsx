@@ -1,15 +1,29 @@
-import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google"
+import type { Metadata } from "next"
+import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
-const fontSans = Geist({
+const fontDisplay = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
+})
+
+const fontSans = Hanken_Grotesk({
   subsets: ["latin"],
   variable: "--font-sans",
 })
 
-const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'})
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+})
+
+export const metadata: Metadata = {
+  title: "Office Hours — Chat with Hitesh Choudhary & Piyush Garg",
+  description:
+    "Sit across the desk from your favourite dev teacher. An AI that talks like Hitesh Choudhary or Piyush Garg — their voice, their teaching style, in Hinglish.",
+}
 
 export default function RootLayout({
   children,
@@ -19,12 +33,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={cn("antialiased", fontSans.variable, "font-mono", jetbrainsMono.variable)}
+      className={cn(
+        "dark antialiased",
+        fontDisplay.variable,
+        fontSans.variable,
+        fontMono.variable,
+      )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
+      <body className="font-sans">{children}</body>
     </html>
   )
 }

@@ -1,0 +1,11 @@
+{
+  "_readme": "RAG sources per persona. `youtube` = real video IDs (the 11-char id from a watch?v=<ID> URL) — the ingest script fetches their captions. `text` = manually curated verbatim snippets (e.g. real tweets/blog lines you paste in). Add your must-have videos here, then run `npm run ingest`. Empty arrays are fine — the app still runs on style alone.",
+  "hitesh": {
+    "youtube": ["mSeGdryJdcc", "8EXIwlEVtJM"],
+    "text": []
+  },
+  "piyush": {
+    "youtube": ["TcQtqzDtP5A", "cW92-pCf_8w"],
+    "text": []
+  }
+}

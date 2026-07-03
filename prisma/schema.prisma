@@ -1,0 +1,57 @@
+// Persona AI — data model
+// Prisma 7 uses the `prisma-client` generator with a required output path.
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../lib/generated/prisma"
+  moduleFormat    = "esm"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+// An anonymous, cookie-scoped visitor. No login; the cookie id ties a browser
+// to its conversation and drives the daily rate limit.
+model Session {
+  id           String    @id @default(cuid())
+  cookieId     String    @unique
+  requestCount Int       @default(0)
+  requestDate  String    @default("") // yyyy-mm-dd bucket for the daily limit
+  createdAt    DateTime  @default(now())
+  messages     Message[]
+
+  @@map("sessions")
+}
+
+// One chat turn. `personaId` records which persona was active for the turn so
+// a single thread can span both personas after a mid-conversation switch.
+model Message {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String // "user" | "assistant"
+  personaId String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([sessionId, createdAt])
+  @@map("messages")
+}
+
+// Verbatim transcript / post / site chunks used for RAG grounding. The
+// embedding column is a pgvector type; similarity search runs via raw SQL.
+model PersonaChunk {
+  id        String                      @id @default(cuid())
+  personaId String
+  source    String // "youtube" | "x" | "site"
+  sourceRef String // video id, tweet url, or page slug
+  content   String                      @db.Text
+  embedding Unsupported("vector(768)")?
+  createdAt DateTime                    @default(now())
+
+  @@index([personaId])
+  @@map("persona_chunks")
+}

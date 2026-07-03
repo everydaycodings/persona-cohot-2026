@@ -123,7 +123,85 @@
   body {
     @apply bg-background text-foreground;
     }
-  html {
-    @apply font-mono;
-    }
+}
+
+/* ===== Office Hours — warm dark "room" + per-persona accent theming ===== */
+
+.dark {
+  --background: #14110e;
+  --foreground: #ede6da;
+  --card: #1e1a15;
+  --card-foreground: #ede6da;
+  --popover: #1e1a15;
+  --popover-foreground: #ede6da;
+  --secondary: #26211b;
+  --secondary-foreground: #ede6da;
+  --muted: #26211b;
+  --muted-foreground: #9a9086;
+  --border: color-mix(in srgb, #ede6da 12%, transparent);
+  --input: color-mix(in srgb, #ede6da 16%, transparent);
+  --destructive: oklch(0.704 0.191 22.216);
+
+  /* Active persona accent — overridden by [data-persona] below. */
+  --accent-persona: #e8813a;
+  --accent-deep: #7a3b14;
+  --primary: var(--accent-persona);
+  --primary-foreground: #14110e;
+  --accent: var(--accent-persona);
+  --accent-foreground: #14110e;
+  --ring: var(--accent-persona);
+}
+
+[data-persona="hitesh"] {
+  --accent-persona: #e8813a;
+  --accent-deep: #7a3b14;
+}
+[data-persona="piyush"] {
+  --accent-persona: #2dd4a7;
+  --accent-deep: #0f5c48;
+}
+
+/* The whole room eases into the new accent on a persona switch. */
+[data-persona] {
+  transition:
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    color 0.35s ease,
+    box-shadow 0.5s ease;
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+/* Code blocks (shiki emits inline-styled <pre>). */
+.prose-chat pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  border: 1px solid var(--border);
+  background: #0f0d0b !important;
+}
+.prose-chat :not(pre) > code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85em;
+  background: color-mix(in srgb, var(--accent-persona) 16%, transparent);
+  color: var(--foreground);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  [data-persona] {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }
