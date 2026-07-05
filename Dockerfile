@@ -29,4 +29,4 @@ EXPOSE 3000
 
 # On boot: sync the schema (creates tables + enables the pgvector extension),
 # then start the server. Client is already generated during `npm ci`.
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm run start"]
+CMD ["sh", "-c", "npx prisma db push && npm run start"]
