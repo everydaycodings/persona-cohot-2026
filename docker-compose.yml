@@ -1,0 +1,44 @@
+# Full stack for a VPS: Postgres (pgvector) + the Next.js app.
+#
+#   cp .env.example .env         # then set OPENROUTER_API_KEY
+#   docker compose up -d --build # build image, start db + app
+#
+# App is served on http://<your-host>:3000
+# (For RAG grounding, after it's up: `docker compose run --rm app npm run ingest`.)
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: persona-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-persona}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-persona}
+      POSTGRES_DB: ${POSTGRES_DB:-persona}
+    volumes:
+      - persona-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-persona} -d ${POSTGRES_DB:-persona}"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    container_name: persona-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # Loads OPENROUTER_API_KEY, models, DAILY_MESSAGE_LIMIT, etc. from your .env.
+    env_file:
+      - .env
+    environment:
+      # Point the app at the in-compose database (overrides DATABASE_URL from .env).
+      DATABASE_URL: postgresql://${POSTGRES_USER:-persona}:${POSTGRES_PASSWORD:-persona}@db:5432/${POSTGRES_DB:-persona}
+    # Bound to localhost only — put nginx in front of it (see note below).
+    # Override the host port with APP_PORT in .env if 3005 is taken.
+    ports:
+      - "127.0.0.1:${APP_PORT:-3005}:3000"
+
+volumes:
+  persona-pg-data:
