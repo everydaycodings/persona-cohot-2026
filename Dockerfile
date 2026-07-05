@@ -14,7 +14,10 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma.config.ts ./prisma.config.ts
 COPY prisma ./prisma
-RUN npm ci
+# `postinstall` runs `prisma generate`, which loads prisma.config.ts and requires
+# DATABASE_URL to *resolve* (it doesn't connect). Supply a throwaway value just for
+# this step — the real one is injected at runtime by docker-compose.
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npm ci
 
 # App source + production build.
 COPY . .
